@@ -1,0 +1,43 @@
+
+from torch import nn as nn
+import torch as th
+
+class PatchEmbed(nn.Module):
+    """ 2D Image to Patch Embedding
+    """
+    def __init__(self, img_size=(210,160), patch_size=(21,16), in_chans=3, embed_dim=225, norm_layer=None):
+        super().__init__()
+        self.img_size = img_size
+        self.patch_size = patch_size
+        self.grid_size = (img_size[0] // patch_size[0], img_size[1] // patch_size[1])
+        self.num_patches = self.grid_size[0] * self.grid_size[1]
+
+        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
+        self.norm = norm_layer(embed_dim) if norm_layer else nn.Identity()
+
+    def forward(self, x):
+        B, C, H, W = x.shape
+        assert H == self.img_size[0] and W == self.img_size[1], \
+            f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
+        x = self.proj(x).flatten(2).transpose(1, 2)
+        x = self.norm(x)
+        return x
+
+
+model=PatchEmbed()
+
+
+x=th.rand(20,3,210,160)
+out=model(x)
+print(out)
+print(out.shape)
+
+
+class VisionTransformer(nn.Module):
+    def __init__(self, img_size=(210,160), patch_size=(21,16), in_chans=3, embed_dim=225, embed_layer=PatchEmbed, norm_layer=None,
+                 d_model=521,nhead=8,num_layers=6):
+        super().__init__()
+        self.patch_embed = embed_layer(
+            img_size=img_size, patch_size=patch_size, in_chans=in_chans, embed_dim=embed_dim)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead)
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
