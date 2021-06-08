@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
+import pdb
 import gym
 import numpy as np
 import torch as th
@@ -74,6 +75,7 @@ class NatureTransformer(BaseFeaturesExtractor):
         x=self.Patchembed(x).transpose(1,2)
         x=self.transformer_encoder(x)
         x=self.Linear(x)
+        pdb.set_trace()
         return x
 
 class TransformerPolicy(DQNPolicy):
