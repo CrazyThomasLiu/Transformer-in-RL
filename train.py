@@ -3,7 +3,7 @@ import difflib
 import importlib
 import os
 import uuid
-
+import pdb
 import gym
 import numpy as np
 import seaborn
@@ -111,7 +111,6 @@ if __name__ == "__main__":  # noqa: C901
     if args.seed < 0:
         # Seed but with a random one
         args.seed = np.random.randint(2 ** 32 - 1, dtype="int64").item()
-
     set_random_seed(args.seed)
 
     # Setting num threads to 1 makes things run faster on cpu
@@ -127,7 +126,7 @@ if __name__ == "__main__":  # noqa: C901
 
     print("=" * 10, env_id, "=" * 10)
     print(f"Seed: {args.seed}")
-
+    #pdb.set_trace()
     exp_manager = ExperimentManager(
         args,
         args.algo,
@@ -161,7 +160,7 @@ if __name__ == "__main__":  # noqa: C901
 
     # Prepare experiment and launch hyperparameter optimization if needed
     model = exp_manager.setup_experiment()
-
+    #pdb.set_trace()
     # Normal training
     if model is not None:
         exp_manager.learn(model)

@@ -5,7 +5,7 @@ import warnings
 from collections import OrderedDict
 from pprint import pprint
 from typing import Any, Callable, Dict, List, Optional, Tuple
-
+import pdb
 import gym
 import numpy as np
 import optuna
@@ -139,13 +139,14 @@ class ExperimentManager(object):
         create the environment and possibly the model.
 
         :return: the initialized RL model
+
         """
         hyperparams, saved_hyperparams = self.read_hyperparameters()
         hyperparams, self.env_wrapper, self.callbacks = self._preprocess_hyperparams(hyperparams)
 
         self.create_log_folder()
         self.create_callbacks()
-
+        #pdb.set_trace()
         # Create env to have access to action space for action noise
         env = self.create_envs(self.n_envs, no_log=False)
 
@@ -157,6 +158,7 @@ class ExperimentManager(object):
             return None
         else:
             # Train an agent from scratch
+            #pdb.set_trace()
             model = ALGOS[self.algo](
                 env=env,
                 tensorboard_log=self.tensorboard_log,
@@ -172,6 +174,7 @@ class ExperimentManager(object):
         """
         :param model: an initialized RL model
         """
+        pdb.set_trace()
         kwargs = {}
         if self.log_interval > -1:
             kwargs = {"log_interval": self.log_interval}
@@ -492,6 +495,7 @@ class ExperimentManager(object):
 
         # On most env, SubprocVecEnv does not help and is quite memory hungry
         # therefore we use DummyVecEnv by default
+
         env = make_vec_env(
             env_id=self.env_id,
             n_envs=n_envs,

@@ -15,7 +15,7 @@ from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize
 from Leo.TransformerDQN import TRDQN
-
+from Leo.TransformerDQN_v2 import TRDQN_v2
 # For custom activation fn
 from torch import nn as nn  # noqa: F401 pylint: disable=unused-import
 
@@ -29,6 +29,7 @@ ALGOS = {
     "td3": TD3,
     # SB3 Contrib,
     "trdqn": TRDQN,
+    "trdqn_v2": TRDQN_v2,
     "tqc": TQC,
 }
 

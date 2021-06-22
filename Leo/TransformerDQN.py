@@ -6,7 +6,7 @@ import numpy as np
 import torch as th
 from torch.nn import functional as F
 from torch import nn
-
+import pdb
 from stable_baselines3.common import logger
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
 from stable_baselines3.common.preprocessing import maybe_transpose
@@ -42,13 +42,16 @@ class NatureTransformer(BaseFeaturesExtractor):
         in_channels=observation_space.shape[0]
         self.img_size = (observation_space.shape[1],observation_space.shape[2])
         ### HxW = 84X84
-        self.patch_size = (4,4) ###how to set the patch size according to the image size
+        #self.patch_size = (4,4) ###how to set the patch size according to the image size
+        self.patch_size = (16, 16)
         self.grid_size = (self.img_size[0] // self.patch_size[0], self.img_size[1] // self.patch_size[1])
         self.num_patches = self.grid_size[0] * self.grid_size[1]
-        self.embed_dim = 256
-        self.d_model = 256
-        self.nhead=8
-        self.num_layers=6
+        #self.embed_dim = 256
+        #self.d_model = 256
+        self.embed_dim = 768
+        self.d_model = 768
+        self.nhead=4
+        self.num_layers=3
         norm_layer = None
         """ 
         2D Image to Patch Embedding
@@ -75,7 +78,7 @@ class NatureTransformer(BaseFeaturesExtractor):
         x=self.Patchembed(x).transpose(1,2)
         x=self.transformer_encoder(x)
         x=self.Linear(x)
-        pdb.set_trace()
+        #pdb.set_trace()
         return x
 
 class TransformerPolicy(DQNPolicy):
@@ -276,10 +279,12 @@ class TRDQN(OffPolicyAlgorithm):
             # Compute Huber loss (less sensitive to outliers)
             loss = F.smooth_l1_loss(current_q_values, target_q_values)
             losses.append(loss.item())
-
+            #pdb.set_trace()
             # Optimize the policy
             self.policy.optimizer.zero_grad()
             loss.backward()
+            #for name, parameter in self.q_net.named_parameters():
+            #    print(name, ':', parameter)
             # Clip gradient norm
             th.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
             self.policy.optimizer.step()
