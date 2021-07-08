@@ -1,5 +1,4 @@
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
-
 import pdb
 import gym
 import numpy as np
@@ -41,7 +40,7 @@ class NatureTransformer(BaseFeaturesExtractor):
         # Re-ordering will be done by pre-preprocessing or wrapper
         in_channels=observation_space.shape[0]
         self.img_size = (observation_space.shape[1],observation_space.shape[2])
-        ### HxW = 84X84
+        ### HxW = 84X84 224X224
         #self.patch_size = (4,4) ###how to set the patch size according to the image size
         self.patch_size = (16, 16)
         self.grid_size = (self.img_size[0] // self.patch_size[0], self.img_size[1] // self.patch_size[1])
@@ -275,7 +274,7 @@ class TRDQN(OffPolicyAlgorithm):
 
             # Retrieve the q-values for the actions from the replay buffer
             current_q_values = th.gather(current_q_values, dim=1, index=replay_data.actions.long())
-
+            #pdb.set_trace()
             # Compute Huber loss (less sensitive to outliers)
             loss = F.smooth_l1_loss(current_q_values, target_q_values)
             losses.append(loss.item())

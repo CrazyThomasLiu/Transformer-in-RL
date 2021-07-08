@@ -1,9 +1,10 @@
 atari:
   env_wrapper:
-    - stable_baselines3.common.atari_wrappers.AtariWrapper
-  frame_stack: 4
+    - Leo.Atariwrapper_size224.AtariWrapper_size224
+    #- stable_baselines3.common.atari_wrappers.AtariWrapper
+  frame_stack: 3
   policy: 'TransformerPolicy'
-  n_timesteps: !!float 1e7
+  n_timesteps: !!float 1e6
   buffer_size: 10000
   learning_rate: !!float 1e-4
   batch_size: 32

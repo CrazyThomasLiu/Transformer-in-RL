@@ -129,7 +129,7 @@ def trunc_normal_(tensor, mean=0., std=1., a=-2., b=2.):
 class PatchEmbed(th.nn.Module):
     """ 2D Image to Patch Embedding
     """
-    def __init__(self, img_size=84, patch_size=16, in_chans=4, embed_dim=512, norm_layer=None):
+    def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=512, norm_layer=None):
         super().__init__()
         img_size = to_2tuple(img_size)
         patch_size = to_2tuple(patch_size)
@@ -150,11 +150,12 @@ class PatchEmbed(th.nn.Module):
         assert H == self.img_size[0] and W == self.img_size[1], \
             f"Input image size ({H}*{W}) doesn't match model ({self.img_size[0]}*{self.img_size[1]})."
         x=self.Patchembed(x)
+        x=x.transpose(1,2)
         #x = self.proj(x).flatten(2).transpose(1, 2)
         #x = self.norm(x)
         return x
 class Attention(th.nn.Module):
-    def __init__(self, dim=512,num_heads=8, qkv_bias=False, qk_scale=None, attn_drop=0., proj_drop=0.):
+    def __init__(self, dim=512,num_heads=4, qkv_bias=False, qk_scale=None, attn_drop=0., proj_drop=0.):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
@@ -167,8 +168,8 @@ class Attention(th.nn.Module):
 
     def forward(self, x):
         B, N, C = x.shape
-        pdb.set_trace()
-        qkv = self.qkv(x).reshape(B, N, 4, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+        #pdb.set_trace()
+        qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
         q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple)
 
         attn = (q @ k.transpose(-2, -1)) * self.scale
@@ -261,8 +262,8 @@ class Visiontransformer(BaseFeaturesExtractor):
             - https://arxiv.org/abs/2012.12877
         """
 
-    def __init__(self, observation_space: gym.spaces.Box, features_dim: int=512,img_size=84, patch_size=16, in_chans=4, embed_dim=512, depth=12,
-                 num_heads=8, mlp_ratio=4., qkv_bias=True, qk_scale=None, representation_size=None,distilled=False,
+    def __init__(self, observation_space: gym.spaces.Box, features_dim: int=512,img_size=224, patch_size=16, in_chans=3, embed_dim=512, depth=12,
+                 num_heads=4, mlp_ratio=4., qkv_bias=True, qk_scale=None, representation_size=None,distilled=False,
                  drop_rate=0., attn_drop_rate=0., drop_path_rate=0., embed_layer=PatchEmbed, norm_layer=None,
                  act_layer=None, weight_init=''):
         """
@@ -363,9 +364,8 @@ class Visiontransformer(BaseFeaturesExtractor):
 
     def forward_features(self, x):
         x = self.patch_embed(x)
-        x=x.transpose(1,2)
+        # pdb.set_trace()
         cls_token = self.cls_token.expand(x.shape[0], -1, -1)  # stole cls_tokens impl from Phil Wang, thanks
-        pdb.set_trace()
         if self.dist_token is None:
             x = th.cat((cls_token, x), dim=1)
         else:
@@ -379,10 +379,8 @@ class Visiontransformer(BaseFeaturesExtractor):
             return x[:, 0], x[:, 1]
 
     def forward(self, x):
-        pdb.set_trace()
         x = self.forward_features(x)
         x = self.results(x)
-        pdb.set_trace()
         """
         if self.head_dist is not None:
             x, x_dist = self.head(x[0]), self.head_dist(x[1])  # x must be a tuple

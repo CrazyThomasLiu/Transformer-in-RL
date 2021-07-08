@@ -174,7 +174,7 @@ class ExperimentManager(object):
         """
         :param model: an initialized RL model
         """
-        pdb.set_trace()
+        #pdb.set_trace()
         kwargs = {}
         if self.log_interval > -1:
             kwargs = {"log_interval": self.log_interval}
@@ -507,7 +507,7 @@ class ExperimentManager(object):
             vec_env_kwargs=self.vec_env_kwargs,
             monitor_kwargs=monitor_kwargs,
         )
-
+        #pdb.set_trace()
         # Wrap the env into a VecNormalize wrapper if needed
         # and load saved statistics when present
         env = self._maybe_normalize(env, eval_env)
@@ -516,6 +516,7 @@ class ExperimentManager(object):
         if self.frame_stack is not None:
             n_stack = self.frame_stack
             env = VecFrameStack(env, n_stack)
+            #pdb.set_trace()
             if self.verbose > 0:
                 print(f"Stacking {n_stack} frames")
 

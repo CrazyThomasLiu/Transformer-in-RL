@@ -3,7 +3,7 @@ atari:
     - Leo.Atariwrapper_size224.AtariWrapper_size224
     #- stable_baselines3.common.atari_wrappers.AtariWrapper
   frame_stack: 3
-  policy: 'TransformerPolicy_v2'
+  policy: 'CNN_TransformerPolicy'
   n_timesteps: !!float 1e6
   buffer_size: 10000
   learning_rate: !!float 1e-4
